@@ -56,7 +56,7 @@ const Chatbot = () => {
     setMessages(prev => [...prev, userMsg]);
     setIsBotTyping(true);
 
-    const nameMatch = input.match(/(?:my name is|i'm|i am|this is|name is|name:|name-)\s+([A-Z][a-zA-Z\-']{1,40})/i);
+    const nameMatch = input.match(/\b(?:my name is|i[' ]?am|i'm|this is|name is|myself|name\s*[:\-]\s*)\s*([A-Z][a-zA-Z\-']{1,40})\b/i);
     if (nameMatch) {
       setUserName(nameMatch[1]);
     }
