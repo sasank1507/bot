@@ -57,6 +57,12 @@ llm = init_chat_model(
     api_key=GOOGLE_API_KEY,
     base_url="https://generativelanguage.googleapis.com/v1beta/openai" 
 )
+'''llm = init_chat_model(
+    model="microsoft/phi-4",               
+    model_provider="openai",
+    api_key="lm-studio",              
+    base_url="http://localhost:1234/v1"
+)'''
 
 
 
