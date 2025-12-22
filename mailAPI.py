@@ -1,18 +1,18 @@
 import os
 import re
-
-os.environ["GOOGLE_API_KEY"] = "AIzaSyBJ1o2mKA2Aow5C9VvSQ0A3QuYHj5E0Ohk"
-
+from dotenv import load_dotenv
 from llama_index.core import Settings
 from llama_index.llms.google_genai import GoogleGenAI
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from fastapi.middleware.cors import CORSMiddleware
-
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Optional
-
 import google.generativeai as genai
+
+load_dotenv()
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+genai.configure(api_key=GOOGLE_API_KEY)
 
 app = FastAPI()
 
@@ -38,7 +38,6 @@ Settings.embed_model = HuggingFaceEmbedding(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
 
-genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 
 def summarize_conversation(convo_text):
     prompt = (

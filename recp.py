@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import os
 import re
 import math
+from dotenv import load_dotenv
 from typing import Dict, Any, List, Optional
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -13,13 +14,14 @@ from langchain.chat_models import init_chat_model
 import google.generativeai as genai
 
 
-
+load_dotenv()
 PDF_DIR = "./sample_files"     
 PERSIST_DIR = "./db"       
 EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
-GOOGLE_API_KEY = "AIzaSyBJ1o2mKA2Aow5C9VvSQ0A3QuYHj5E0Ohk"
-
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 genai.configure(api_key=GOOGLE_API_KEY)
+
+
 
 session_memory: Dict[str, Dict[str, Any]] = {}
 
@@ -81,8 +83,13 @@ def extract_name(text: str) -> str:
         r"\bI'm\s+([A-Z][a-zA-Z\-']{1,40})\b",
         r"\bthis is\s+([A-Z][a-zA-Z\-']{1,40})\b",
         r"\bname is\s+([A-Z][a-zA-Z\-']{1,40})\b",
-         r"\bname-\s+([A-Z][a-zA-Z\-']{1,40})\b",
-          r"\bname:\s+([A-Z][a-zA-Z\-']{1,40})\b"
+        r"\bname-\s+([A-Z][a-zA-Z\-']{1,40})\b",
+        r"\bname:\s+([A-Z][a-zA-Z\-']{1,40})\b",
+        r"\bmyself\s+([A-Z][a-zA-Z\-']{1,40})\b",
+        r"\bname -\s+([A-Z][a-zA-Z\-']{1,40})\b",
+        r"\bname :\s+([A-Z][a-zA-Z\-']{1,40})\b",
+        r"\bname-\s*([A-Z][a-zA-Z\-']{1,40})\b",
+        r"\bname:\s*([A-Z][a-zA-Z\-']{1,40})\b"
     ]
     for p in patterns:
         m = re.search(p, text, flags=re.IGNORECASE)
@@ -362,7 +369,7 @@ async def ask_api(data: QueryIn, request: Request):
             "answer": f"Nice to meet you, {name}!"
         }
     
-    if is_acknowledgment(user_input):
+    '''if is_acknowledgment(user_input):
         stored_name = session_memory.get(client_key, {}).get("name")
         if stored_name:
             answer = f"Great! I'm here to help you, {stored_name}. What would you like to know about Argano's services?"
@@ -374,6 +381,8 @@ async def ask_api(data: QueryIn, request: Request):
                 "answer": persona_answer,
                 "word_count": len(answer.split())
             }
+    '''
+   
     
     relevance_type, top_score = is_relevant_to_company(user_input)
     
@@ -411,4 +420,6 @@ async def ask_api(data: QueryIn, request: Request):
             "top_score": top_score,
             "word_count": len(answer.split())
         }
+    
+    
 
