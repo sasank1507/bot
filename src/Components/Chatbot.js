@@ -56,10 +56,10 @@ const Chatbot = () => {
     setMessages(prev => [...prev, userMsg]);
     setIsBotTyping(true);
 
-    const nameMatch = input.match(/\b(?:my name is|i[' ]?am|i'm|this is|name is|myself|name\s*[:\-]\s*)\s*([A-Z][a-zA-Z\-']{1,40})\b/i);
-    if (nameMatch) {
-      setUserName(nameMatch[1]);
-    }
+    // const nameMatch = input.match(/\b(?:my name is|i[' ]?am|i'm|this is|name is|myself|name\s*[:\-]\s*)\s*([A-Z][a-zA-Z\-']{1,40})\b/i);
+    // if (nameMatch) {
+    //   setUserName(nameMatch[1]);
+    // }
 
     const contactPattern = /(\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b|(?:\+?1?\d{9,15}))/;
     const contactMatch = input.match(contactPattern);
@@ -82,6 +82,10 @@ const Chatbot = () => {
       });
 
       const data = await response.json();
+      const data = await response.json();
+      if(data.name){
+        setUserName(data.name)
+      }
       setMessages(prev => [...prev, { from: "bot", text: data.answer, agentMode: data.agent_mode || personalityMode }]);
     } catch (error) {
       setMessages(prev => [...prev, {
