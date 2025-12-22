@@ -57,6 +57,7 @@ llm = init_chat_model(
     api_key=GOOGLE_API_KEY,
     base_url="https://generativelanguage.googleapis.com/v1beta/openai" 
 )
+
 '''llm = init_chat_model(
     model="microsoft/phi-4",               
     model_provider="openai",
@@ -404,7 +405,8 @@ async def ask_api(data: QueryIn, request: Request):
         contact = contact_match.group(0)
         session_memory.setdefault(client_key, {})["contact"] = contact
         return {
-            "answer": "Got it! Please click **Draft** when you're ready to send."
+            "answer": "Got it! Please click **Draft** when you're ready to send.",
+            "name": session_memory.get(client_key, {}).get("name")
         }
     ack_result = is_acknowledgment_with_response(user_input, client_key)
     ack_intent = ack_result.get("intent")
@@ -413,7 +415,7 @@ async def ask_api(data: QueryIn, request: Request):
     if ack_intent == "ACKNOWLEDGE_ONLY":
         final_answer = inject_personality(ack_response, user_input, personality_mode)
         print(f"\nAgent: Acknowledgment Handler\n")
-        return {"answer": final_answer, "agent_type": "acknowledgment"}
+        return {"answer": final_answer, "agent_type": "acknowledgment","name": session_memory.get(client_key, {}).get("name")}
     
     result = classify_intent_and_extract(user_input, client_key)
     intent = result.get("intent")
@@ -422,7 +424,7 @@ async def ask_api(data: QueryIn, request: Request):
     if intent == "GREETING_ONLY":
         final_answer = inject_personality(llm_response, user_input, personality_mode)
         print(f"\nAgent: Greeting Agent\n")
-        return {"answer": final_answer, "agent_type": "greeting"}
+        return {"answer": final_answer, "agent_type": "greeting","name": session_memory.get(client_key, {}).get("name")}
     
     
     
@@ -437,6 +439,7 @@ async def ask_api(data: QueryIn, request: Request):
         rag_resp["answer"]=persona_answer
         rag_resp["word_count"] = len(rag_answer.split())
         rag_resp["top_score"] = top_score
+        rag_resp["name"]=session_memory.get(client_key, {}).get("name")
         
         
         return rag_resp
@@ -452,7 +455,8 @@ async def ask_api(data: QueryIn, request: Request):
         return {
             "answer": persona_answer,
             "top_score": top_score,
-            "word_count": len(answer.split())
+            "word_count": len(answer.split()),
+            "name": session_memory.get(client_key, {}).get("name")
         }
     
     else:
@@ -461,6 +465,7 @@ async def ask_api(data: QueryIn, request: Request):
         return {
             "answer": answer,
             "top_score": top_score,
-            "word_count": len(answer.split())
+            "word_count": len(answer.split()),
+            "name": session_memory.get(client_key, {}).get("name")
         }
 
